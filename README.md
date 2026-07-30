@@ -1,4 +1,4 @@
-# GameBoy emulator written in C++
+# Game Boy emulator written in C++
 
 ## This is an in-progress Game Boy emulator written in C++, built with CMAKE and Make, and graphics Rendering with SDL3
 * The goal of this project is to create a fully functional Game Boy emulator.
@@ -9,6 +9,8 @@
 * Showcase PPU(Pixel Processing Unit) emulation.
 * Showcase APU(Audio Processing Unit) emulation.
 * Showcase MMIO(Memory-Mapped IO) operations.
+* Showcase Timers
+* Showcase Emulator Clock
 
 
 
