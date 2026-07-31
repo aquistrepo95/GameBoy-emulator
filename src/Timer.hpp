@@ -2,6 +2,7 @@
 #define TIMER_HPP
 #include <cstdint>
 #include "EmulatorClock.hpp"
+#include "system_bus.hpp"
 
 class Timer{
     private:
@@ -29,7 +30,10 @@ class Timer{
     public:
         Timer() = default;
 
+        bool respond_to_operation(std::uint16_t address) const;
+
         bool cycle_tick(std::uint32_t cycles);
+
 };
 
 

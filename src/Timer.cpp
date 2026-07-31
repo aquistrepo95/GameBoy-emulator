@@ -1,5 +1,14 @@
 #include "Timer.hpp"
 
+bool Timer :: respond_to_operation(uint16_t address) const {
+    if(address >= 0xff04 && address <= 0xff07){
+        return true;
+    }
+
+    return false;
+}
+
+
 bool Timer :: cycle_tick(std::uint32_t cycles) {
     // verify if TIMA overflowed
     bool overflow_interupt = false;
