@@ -5,7 +5,7 @@
 #include "APU.hpp"
 
 
-class EmulatorClock{
+class EmulatorClock {
     private:
 
         std::uint64_t total_cycles = 0;

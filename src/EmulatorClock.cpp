@@ -1,9 +1,7 @@
 #include "EmulatorClock.hpp" 
 
 
-EmulatorClock :: EmulatorClock(Timer& timer) {
-    this->timer = timer;
-}
+EmulatorClock :: EmulatorClock(Timer& t) : timer(t) {}
 
 
 bool EmulatorClock :: cycle_tick(std::uint32_t cycles) {

@@ -4,7 +4,7 @@
 #include "EmulatorClock.hpp"
 #include "system_bus.hpp"
 
-class Timer{
+class Timer : public SystemBus {
     private:
         // internal registers i.e 16-bit internal timer(div 1st 8-bits), TIMA, TMA, TAC
         std::uint16_t internal_timer_div = 0;
@@ -30,7 +30,7 @@ class Timer{
     public:
         Timer() = default;
 
-        bool respond_to_operation(std::uint16_t address) const;
+        bool respond_to_operation(std::uint16_t address) const override;
 
         bool cycle_tick(std::uint32_t cycles);
 

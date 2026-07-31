@@ -157,9 +157,9 @@ std::uint8_t MMU :: read_from_bytes(std::uint16_t address) {
 
     // route video ram reads to the PPU
     else if(address >= 0x8000 && address <= 0x9fff) {
-        for(auto & device : IO_devices) {
-            if(device->respond_to_operation(address)) {
-                return device->read_from_IO(address);
+        for(auto device : IO_devices) {
+            if(device.get().respond_to_operation(address)) {
+                return device.get().read_from_IO(address);
             }
         }
 
@@ -183,8 +183,8 @@ std::uint8_t MMU :: read_from_bytes(std::uint16_t address) {
     // route OAM reads to the PPU
     else if(address >= 0xfe00 && address <= 0xfe9f) {
         for(auto & device : IO_devices) {
-            if(device->respond_to_operation(address)) {
-                return device->read_from_IO(address);
+            if(device.get().respond_to_operation(address)) {
+                return device.get().read_from_IO(address);
             }
         }
 
@@ -199,8 +199,8 @@ std::uint8_t MMU :: read_from_bytes(std::uint16_t address) {
     // route I/O reads to IO 
     else if(address >= 0xff00 && address <= 0xff7f) {
         for(auto & device : IO_devices) {
-            if(device->respond_to_operation(address)) {
-                return device->read_from_IO(address);
+            if(device.get().respond_to_operation(address)) {
+                return device.get().read_from_IO(address);
             }
         }
 
@@ -230,8 +230,8 @@ void MMU :: write_to_bytes(std::uint16_t address, std::uint8_t value) {
     // route video ram writes to the PPU
     else if(address >= 0x8000 && address <= 0x9fff) {
         for(auto & device : IO_devices) {
-            if(device->respond_to_operation(address)) {
-                device->write_to_IO(address, value);
+            if(device.get().respond_to_operation(address)) {
+                device.get().write_to_IO(address, value);
             }
         }          
     }
@@ -255,8 +255,8 @@ void MMU :: write_to_bytes(std::uint16_t address, std::uint8_t value) {
     // route OAM writes to the PPU
     else if(address >= 0xfe00 && address <= 0xfe9f) {
         for(auto & device : IO_devices) {
-            if(device->respond_to_operation(address)) {
-                device->write_to_IO(address, value);
+            if(device.get().respond_to_operation(address)) {
+                device.get().write_to_IO(address, value);
             }
         }        
     }
@@ -274,8 +274,8 @@ void MMU :: write_to_bytes(std::uint16_t address, std::uint8_t value) {
     // route I/O writes to IO 
     else if(address >= 0xff00 && address <= 0xff7f) {
         for(auto & device : IO_devices) {
-            if(device->respond_to_operation(address)) {
-                device->write_to_IO(address, value);
+            if(device.get().respond_to_operation(address)) {
+                device.get().write_to_IO(address, value);
             }
         }        
     }
