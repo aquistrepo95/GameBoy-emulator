@@ -1,5 +1,6 @@
 #include "Timer.hpp"
 
+// respond to operation function
 bool Timer :: respond_to_operation(uint16_t address) const {
     if(address >= 0xff04 && address <= 0xff07){
         return true;
@@ -8,7 +9,7 @@ bool Timer :: respond_to_operation(uint16_t address) const {
     return false;
 }
 
-
+// cycle tick function
 bool Timer :: cycle_tick(std::uint32_t cycles) {
     // verify if TIMA overflowed
     bool overflow_interupt = false;
@@ -42,4 +43,26 @@ bool Timer :: cycle_tick(std::uint32_t cycles) {
     }
 
     return overflow_interupt;
+}
+
+// read from IO function
+std::uint8_t Timer :: read_from_IO(std::uint16_t address) {
+    switch(address) {
+        case 0xff04: return (internal_timer_div >> 8); // upper 8 bits of internal_timer_div
+        case 0xff05: return TIMA;
+        case 0xff06: return TMA;
+        case 0xff07: return TAC;
+        default:     return 0xff; // invalid address
+    }
+}
+
+// write to IO function
+void Timer :: write_to_IO(std::uint16_t address, std::uint8_t value) {
+    switch(address) {
+        case 0xff04: internal_timer_div = 0; break; // writing to this register resets it
+        case 0xff05: TIMA = value; break;
+        case 0xff06: TMA  = value; break;
+        case 0xff07: TAC  = value & 0x07; break; // only lower 3 bits are writable
+        default:     break; // invalid address
+    }
 }

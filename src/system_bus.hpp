@@ -11,7 +11,7 @@ class SystemBus {
         virtual bool respond_to_operation(std::uint16_t address) const  = 0;
 
         // read or write to IO devices
-        virtual uint8_t read_from_IO(std::uint16_t address) = 0;
+        virtual std::uint8_t read_from_IO(std::uint16_t address) = 0;
         virtual void write_to_IO(std::uint16_t address, std::uint8_t value) = 0;
 
 };

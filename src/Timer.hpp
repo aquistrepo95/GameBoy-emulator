@@ -34,6 +34,10 @@ class Timer : public SystemBus {
 
         bool cycle_tick(std::uint32_t cycles);
 
+        std::uint8_t read_from_IO(std::uint16_t address) override;
+
+        void write_to_IO(std::uint16_t address, std::uint8_t value) override;
+
 };
 
 
