@@ -4,7 +4,7 @@
 EmulatorClock :: EmulatorClock(Timer& t) : timer(t) {}
 
 
-bool EmulatorClock :: cycle_tick(std::uint32_t cycles) {
+bool EmulatorClock :: cycle_tick(u32 cycles) {
     total_cycles += cycles;
 
     bool overflow_interupt = timer.cycle_tick(cycles);

@@ -15,16 +15,16 @@ class MMU{
         bool boot_rom_mapped = true;
 
         // memory allocation for cartridge
-        std::vector<std::uint8_t> rom_bank; // rom
-        std::vector<std::uint8_t> eram_bank; //external ram 
+        std::vector<u8> rom_bank; // rom
+        std::vector<u8> eram_bank; //external ram 
 
         // save path .sav
         std::string active_save_path;
 
         // memory allocation for gameboy internal components
-        std::array<std::uint8_t, 0x1fff + 1> wram{}; // 8kb wram
-        std::array<std::uint8_t, 0x7f> hram{}; // 127 hram
-        std::uint8_t ie{}; // 8bit interrupt enable register
+        std::array<u8, 0x1fff + 1> wram{}; // 8kb wram
+        std::array<u8, 0x7f> hram{}; // 127 hram
+        u8 ie{}; // 8bit interrupt enable register
 
         // IO device vector
         std::vector<std::reference_wrapper<SystemBus>> IO_devices;
@@ -40,7 +40,7 @@ class MMU{
         void disable_bootROM();
 
         // find the RAM size
-        std::uint32_t find_eram_size(std::string active_save_path, std::uint8_t ram_size_header);
+        u32 find_eram_size(std::string active_save_path, u8 ram_size_header);
 
         // load the game ROM
         void load_ROM(const char*);
@@ -49,8 +49,8 @@ class MMU{
         void save_eram();
 
         // getter and setter(read and write)
-        std::uint8_t read_from_bytes(std::uint16_t address);
-        void write_to_bytes(std::uint16_t address, std::uint8_t value);
+        u8 read_from_bytes(u16 address);
+        void write_to_bytes(u16 address, u8 value);
 
         // function to add IO to IO_devices
         void add_IO_devices(SystemBus& IO_device) {

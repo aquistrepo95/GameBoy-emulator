@@ -9,8 +9,8 @@ void MMU :: disable_bootROM() {
 }
 
 // get the eram size
-std::uint32_t MMU :: find_eram_size(std::string active_save_file, std::uint8_t eram_header) {
-    std::uint32_t eram_size = 0;
+u32 MMU :: find_eram_size(std::string active_save_file, u8 eram_header) {
+    u32 eram_size = 0;
 
     switch(eram_header) {
         case 0x00: eram_size = 0;       break;
@@ -40,7 +40,7 @@ std::uint32_t MMU :: find_eram_size(std::string active_save_file, std::uint8_t e
         std::streamsize size = file.tellg();
         file.seekg(0, std::ios::beg);
 
-        std::vector<std::uint8_t>eram_buffer;
+        std::vector<u8>eram_buffer;
         eram_buffer.resize(size);
 
         if(file.read(reinterpret_cast<char*>(eram_buffer.data()), size)) {
@@ -78,7 +78,7 @@ void MMU :: load_ROM(const char* RomFile) {
     }
     
     // create temporary buffer and resize it to the size of the ROM
-    std::vector<std::uint8_t>buffer;
+    std::vector<u8>buffer;
     buffer.resize(size);
 
     // move the pointer to the begining of the file and load the contents into buffer
@@ -91,7 +91,7 @@ void MMU :: load_ROM(const char* RomFile) {
     }
 
     // get the ROM size from the header
-    std::uint32_t header_rom_size = 32768 << buffer[0x0148];
+    u32 header_rom_size = 32768 << buffer[0x0148];
 
     // check if header_rom_size is greater than buffer and pad 
     if(buffer.size() < header_rom_size) {
@@ -99,7 +99,7 @@ void MMU :: load_ROM(const char* RomFile) {
     }
 
     // set rom_size variable in the MBC_bus abstract class
-    std::uint32_t rom_size = static_cast<std::uint32_t>(buffer.size());
+    u32 rom_size = static_cast<u32>(buffer.size());
     mbc1->set_rom_size(rom_size);
     rom_bank = std::move(buffer);
 
@@ -109,7 +109,7 @@ void MMU :: load_ROM(const char* RomFile) {
     active_save_path = save_file.string();
 
     // get the RAM size
-    std::uint32_t eram_size = find_eram_size(active_save_path, buffer[0x0149]); 
+    u32 eram_size = find_eram_size(active_save_path, buffer[0x0149]); 
     mbc1->set_ram_size(eram_size);
 }
 
@@ -137,7 +137,7 @@ void MMU :: save_eram() {
 }
 
 // reads
-std::uint8_t MMU :: read_from_bytes(std::uint16_t address) {
+u8 MMU :: read_from_bytes(u16 address) {
     // boot rom i.e nintendo logo
     if(boot_rom_mapped == true && address >= 0x0000 && address <= 0x0100) {
         return 0xff;
@@ -150,7 +150,7 @@ std::uint8_t MMU :: read_from_bytes(std::uint16_t address) {
 
     // handle cartridge switchable banks
     else if(address >= 0x4000 && address <= 0x7fff) {
-        std::uint32_t location = mbc1->get_rom_upper_offset() + (address - 0x4000); 
+        u32 location = mbc1->get_rom_upper_offset() + (address - 0x4000); 
         return rom_bank[location];
     }
 
