@@ -49,8 +49,11 @@ class MMU{
         void save_eram();
 
         // getter and setter(read and write)
-        u8 read_from_bytes(u16 address);
+        u8 read_from_bytes(u16 address) const;
         void write_to_bytes(u16 address, u8 value);
+
+        // verify interrupts
+        bool pending_interrupts() const;
 
         // function to add IO to IO_devices
         void add_IO_devices(SystemBus& IO_device) {

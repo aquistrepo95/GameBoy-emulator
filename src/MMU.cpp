@@ -137,7 +137,7 @@ void MMU :: save_eram() {
 }
 
 // reads
-u8 MMU :: read_from_bytes(u16 address) {
+u8 MMU :: read_from_bytes(u16 address) const {
     // boot rom i.e nintendo logo
     if(boot_rom_mapped == true && address >= 0x0000 && address <= 0x0100) {
         return 0xff;
@@ -218,7 +218,7 @@ u8 MMU :: read_from_bytes(u16 address) {
 }
 
 // Writes
-void MMU :: write_to_bytes(std::uint16_t address, std::uint8_t value) {
+void MMU :: write_to_bytes(u16 address, u8 value) {
     // ROM banks
     if(address >= 0x0000 && address <= 0x7fff) {
         if(mbc1) {
@@ -288,4 +288,12 @@ void MMU :: write_to_bytes(std::uint16_t address, std::uint8_t value) {
     else if(address == 0xffff){
         ie = value;
     }
+}
+
+// verify pending interrupts
+bool MMU :: pending_interrupts() const {
+    u8 interrupt_flag_    = read_from_bytes(0xff0f); 
+    u8 interrupt_enabled_ = read_from_bytes(0xffff);
+
+    return (interrupt_flag_ & interrupt_enabled_ & 0x1F) != 0;
 }
