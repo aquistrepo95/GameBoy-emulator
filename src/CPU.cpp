@@ -435,7 +435,7 @@ void CPU :: DEC_r16() {
 
 void CPU :: DEC_r8() {
     // check if half carry will occur after addtion operation
-    bool check_half_carry = (opcode & 0x0f) == 0x0f;
+    bool check_half_carry = (opcode & 0x0f) == 0x00;
 
     u8 operand = (opcode & 0x38) >> 3; // bits 5-3
     u8 value   = 0;
@@ -530,12 +530,15 @@ void CPU :: CPL() {
 }
 
 void CPU :: CCF() {
-    bool check_carry_flag = (rg.f & rg.Carry_flag) == 0;
-    rg.f &= ~(rg.HalfCarry_flag | rg.Subtract_flag | rg.Carry_flag);
+    bool check_carry_flag = (rg.f & rg.Carry_flag) == 1;
 
     if(check_carry_flag) {
-        rg.set_flag(rg.Carry_flag, true);
+        rg.set_flag(rg.Carry_flag, false);
     }
+
+    rg.set_flag(rg.Subtract_flag, false);
+    rg.set_flag(rg.HalfCarry_flag, false);
+    
     clock.cycle_tick(nonCB_opcode_cycles[opcode]);  
 }
 
