@@ -538,12 +538,12 @@ void CPU :: CCF() {
 
     rg.set_flag(rg.Subtract_flag, false);
     rg.set_flag(rg.HalfCarry_flag, false);
-    
+
     clock.cycle_tick(nonCB_opcode_cycles[opcode]);  
 }
 
 // adjust the A(accumulator) register
-void CPU :: DAA() {
+void CPU :: DAA() { // comeback here
     u16 value      = rg.a;
     bool set_carry = false;
 
@@ -584,72 +584,75 @@ void CPU :: DAA() {
 
 // set carry flag
 void CPU :: SCF() {
-    rg.f &= ~(rg.HalfCarry_flag | rg.Subtract_flag);
-
     rg.set_flag(rg.Carry_flag, true);
+
+    rg.set_flag(rg.Subtract_flag, false);
+    rg.set_flag(rg.HalfCarry_flag, false);
+
     clock.cycle_tick(nonCB_opcode_cycles[opcode]);
 }
 
 // add functions
 void CPU :: ADD_a_r8() {
-    u8 source_value = read_register(opcode & 0x07);
+    u8 operand = read_register(opcode & 0x07);
     bool check_half_carry = false;
     bool check_carry = false;
     u16 result = 0;
-    switch(source_value) {
+
+    switch(operand) {
         case 0: {
             check_half_carry = ((rg.a & 0x0f) + (rg.b & 0x0f)) > 0x0f;
-            result = rg.a + rg.b;
+            result = static_cast<u16>(rg.a) + static_cast<u16>(rg.b);
             check_carry = result > 0xff;
             rg.a = static_cast<u8>(result);
             break;
         }
         case 1: {
             check_half_carry = ((rg.a & 0x0f) + (rg.c & 0x0f)) > 0x0f;
-            result = rg.a + rg.c;
+            result = static_cast<u16>(rg.a) + static_cast<u16>(rg.c);
             check_carry = result > 0xff;
             rg.a = static_cast<u8>(result);
             break;
         }
         case 2: {
             check_half_carry = ((rg.a & 0x0f) + (rg.d & 0x0f)) > 0x0f;
-            result = rg.a + rg.d;
+            result = static_cast<u16>(rg.a) + static_cast<u16>(rg.d);
             check_carry = result > 0xff;
             rg.a = static_cast<u8>(result);
             break;
         }
         case 3: {
             check_half_carry = ((rg.a & 0x0f) + (rg.e & 0x0f)) > 0x0f;
-            result = rg.a + rg.e;
+            result = static_cast<u16>(rg.a) + static_cast<u16>(rg.e);
             check_carry = result > 0xff;
             rg.a = static_cast<u8>(result);
             break;
         }
         case 4: {
             check_half_carry = ((rg.a & 0x0f) + (rg.h & 0x0f)) > 0x0f;
-            result = rg.a + rg.h;
+            result = static_cast<u16>(rg.a) + static_cast<u16>(rg.h);
             check_carry = result > 0xff;
             rg.a = static_cast<u8>(result);
             break;
         }
         case 5: {
             check_half_carry = ((rg.a & 0x0f) + (rg.l & 0x0f)) > 0x0f;
-            result = rg.a + rg.l;
+            result = static_cast<u16>(rg.a) + static_cast<u16>(rg.l);
             check_carry = result > 0xff;
             rg.a = static_cast<u8>(result);
             break;
         }
         case 6: {
             u8 value = mmu.get().read_from_bytes(rg.hl);
-            check_half_carry = ((rg.a & 0x0f) + (value & 0x0f)) > 0x0f;\
-            result = rg.a + value;
+            check_half_carry = ((rg.a & 0x0f) + (value & 0x0f)) > 0x0f;
+            result = static_cast<u16>(rg.a) + static_cast<u16>(value);
             check_carry = result > 0xff;
             rg.a = static_cast<u8>(result);
             break;
         }
         case 7: {
             check_half_carry = ((rg.a & 0x0f) + (rg.a & 0x0f)) > 0x0f;
-            result = rg.a + rg.a;
+            result = static_cast<u16>(rg.a) + static_cast<u16>(rg.a);
             check_carry = result > 0xff;
             rg.a = static_cast<u8>(result);
             break;
@@ -666,51 +669,51 @@ void CPU :: ADD_a_r8() {
 }
 
 void CPU :: ADC_a_r8() {
-    u8 source_value = read_register(opcode & 0x07);
+    u8 operand = read_register(opcode & 0x07);
     bool check_half_carry = false;
     bool check_carry = false;
     u8 carry_bit = (rg.f & 0x10) >> 4;
     u16 result = 0;
 
-    switch(source_value) {
+    switch(operand) {
         case 0: {
             check_half_carry = ((rg.a & 0x0f) + (rg.b & 0x0f) + carry_bit) > 0x0f;
-            result = rg.a + rg.b + carry_bit;
+            result = static_cast<u16>(rg.a) + static_cast<u16>(rg.b) + static_cast<u16>(carry_bit);
             check_carry = result > 0xff;
             rg.a = static_cast<u8>(result);
             break;
         }
         case 1: {
             check_half_carry = ((rg.a & 0x0f) + (rg.c & 0x0f) + carry_bit) > 0x0f;
-            result = rg.a + rg.c + carry_bit;
+            result = static_cast<u16>(rg.a) + static_cast<u16>(rg.c) + static_cast<u16>(carry_bit);
             check_carry = result > 0xff;
             rg.a = static_cast<u8>(result);
             break;
         }
         case 2: {
             check_half_carry = ((rg.a & 0x0f) + (rg.d & 0x0f) + carry_bit) > 0x0f;
-            result = rg.a + rg.d + carry_bit;
+            result = static_cast<u16>(rg.a) + static_cast<u16>(rg.d) + static_cast<u16>(carry_bit);
             check_carry = result > 0xff;
             rg.a = static_cast<u8>(result);
             break;
         }
         case 3: {
             check_half_carry = ((rg.a & 0x0f) + (rg.e & 0x0f) + carry_bit) > 0x0f;
-            result = rg.a + rg.e + carry_bit;
+            result = static_cast<u16>(rg.a) + static_cast<u16>(rg.e) + static_cast<u16>(carry_bit);
             check_carry = result > 0xff;
             rg.a = static_cast<u8>(result);
             break;
         }
         case 4: {
             check_half_carry = ((rg.a & 0x0f) + (rg.h & 0x0f) + carry_bit) > 0x0f;
-            result = rg.a + rg.h + carry_bit;
+            result = static_cast<u16>(rg.a) + static_cast<u16>(rg.h) + static_cast<u16>(carry_bit);
             check_carry = result > 0xff;
             rg.a = static_cast<u8>(result);
             break;
         }
         case 5: {
             check_half_carry = ((rg.a & 0x0f) + (rg.l & 0x0f) + carry_bit) > 0x0f;
-            result = rg.a + rg.l + carry_bit;
+            result = static_cast<u16>(rg.a) + static_cast<u16>(rg.l) + static_cast<u16>(carry_bit);
             check_carry = result > 0xff;
             rg.a = static_cast<u8>(result);
             break;
@@ -718,14 +721,14 @@ void CPU :: ADC_a_r8() {
         case 6: {
             u8 value = mmu.get().read_from_bytes(rg.hl);
             check_half_carry = ((rg.a & 0x0f) + (value & 0x0f) + carry_bit) > 0x0f;
-            result = rg.a + value + carry_bit;
+            result = static_cast<u16>(rg.a) + static_cast<u16>(value) + static_cast<u16>(carry_bit);
             check_carry = result > 0xff;
             rg.a = static_cast<u8>(result);
             break;
         }
         case 7: {
             check_half_carry = ((rg.a & 0x0f) + (rg.a & 0x0f) + carry_bit) > 0x0f;
-            result = rg.a + rg.a + carry_bit;
+            result = static_cast<u16>(rg.a) + static_cast<u16>(rg.a) + static_cast<u16>(carry_bit);
             check_carry = result > 0xff;
             rg.a = static_cast<u8>(result);
             break;
