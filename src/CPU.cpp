@@ -1253,52 +1253,53 @@ void CPU :: JR_cond_imm8() {
     switch(condition) {
         case 0: // JR NZ, imm8
             if(!rg.get_Zero_flag()) {
-                u8 offset = static_cast<u8>(mmu.get().read_from_bytes(rg.program_counter));
-                rg.program_counter += 1;
+                u8 offset = static_cast<u8>(mmu.get().read_from_bytes(rg.program_counter++));
                 rg.program_counter += offset;
+                clock.cycle_tick(nonCB_opcode_cycles[opcode]);
             }
             else {
                 rg.program_counter += 1;
+                clock.cycle_tick(8);
             }
             break;
         case 1: // JR Z, imm8
             if(rg.get_Zero_flag()) {
-                u8 offset = static_cast<u8>(mmu.get().read_from_bytes(rg.program_counter));
-                rg.program_counter += 1;
+                u8 offset = static_cast<u8>(mmu.get().read_from_bytes(rg.program_counter++));
                 rg.program_counter += offset;
+                clock.cycle_tick(nonCB_opcode_cycles[opcode]);
             }
             else {
                 rg.program_counter += 1; 
+                clock.cycle_tick(8);
             }
             break;
         case 2: // JR NC, imm8
             if(!rg.get_Carry_flag()) {
-                u8 offset = static_cast<u8>(mmu.get().read_from_bytes(rg.program_counter));
-                rg.program_counter += 1;
+                u8 offset = static_cast<u8>(mmu.get().read_from_bytes(rg.program_counter++));
                 rg.program_counter += offset;
+                clock.cycle_tick(nonCB_opcode_cycles[opcode]);
             }
             else {
                 rg.program_counter += 1; 
+                clock.cycle_tick(8);
             }
             break;   
         case 3: // JR C, imm8
             if(rg.get_Carry_flag()) {
-                u8 offset = static_cast<u8>(mmu.get().read_from_bytes(rg.program_counter));
-                rg.program_counter += 1;
+                u8 offset = static_cast<u8>(mmu.get().read_from_bytes(rg.program_counter++));
                 rg.program_counter += offset;
+                clock.cycle_tick(nonCB_opcode_cycles[opcode]);
             }
             else {
                 rg.program_counter += 1;
+                clock.cycle_tick(8);
             }
             break;   
     }
-
-    clock.cycle_tick(nonCB_opcode_cycles[opcode]);
 }
 
 void CPU :: JR_imm8() {
-    u8 offset = static_cast<u8>(mmu.get().read_from_bytes(rg.program_counter));
-    rg.program_counter += 1;
+    u8 offset = static_cast<u8>(mmu.get().read_from_bytes(rg.program_counter++));
 
     rg.program_counter += offset;
     clock.cycle_tick(nonCB_opcode_cycles[opcode]);
@@ -1309,77 +1310,71 @@ void CPU :: JP_cond_imm16() {
     switch(condition) {
         case 0: // JP NZ, imm16
             if(!rg.get_Zero_flag()) {
-                u8 low_byte = mmu.get().read_from_bytes(rg.program_counter);
-                rg.program_counter += 1;
-                u8 high_byte = mmu.get().read_from_bytes(rg.program_counter);
-                rg.program_counter += 1;
+                u8 low_byte  = mmu.get().read_from_bytes(rg.program_counter++);
+                u8 high_byte = mmu.get().read_from_bytes(rg.program_counter++);
 
                 rg.program_counter = (static_cast<u16>(high_byte) << 8) | low_byte;
+                clock.cycle_tick(nonCB_opcode_cycles[opcode]);
             }
             else {
-                rg.program_counter += 2; // skip the immediate value
+                rg.program_counter += 2; 
+                clock.cycle_tick(12);
             }
             break;
         case 1: // JP Z, imm16
             if(rg.get_Zero_flag()) {
-                u8 low_byte = mmu.get().read_from_bytes(rg.program_counter);
-                rg.program_counter += 1;
-                u8 high_byte = mmu.get().read_from_bytes(rg.program_counter);
-                rg.program_counter += 1;
+                u8 low_byte  = mmu.get().read_from_bytes(rg.program_counter++);
+                u8 high_byte = mmu.get().read_from_bytes(rg.program_counter++);
 
                 rg.program_counter = (static_cast<u16>(high_byte) << 8) | low_byte;
+                clock.cycle_tick(nonCB_opcode_cycles[opcode]);
             }
             else {
-                rg.program_counter += 2; // skip the immediate value
+                rg.program_counter += 2;
+                clock.cycle_tick(12);
             }
             break;
         case 2: // JP NC, imm16
             if(!rg.get_Carry_flag()) {
-                u8 low_byte = mmu.get().read_from_bytes(rg.program_counter);
-                rg.program_counter += 1;
-                u8 high_byte = mmu.get().read_from_bytes(rg.program_counter);
-                rg.program_counter += 1;
+                u8 low_byte  = mmu.get().read_from_bytes(rg.program_counter++);
+                u8 high_byte = mmu.get().read_from_bytes(rg.program_counter++);
 
                 rg.program_counter = (static_cast<u16>(high_byte) << 8) | low_byte;
+                clock.cycle_tick(nonCB_opcode_cycles[opcode]);
             }
             else {
-                rg.program_counter += 2; // skip the immediate value
+                rg.program_counter += 2;
+                clock.cycle_tick(12); 
             }
             break;
         case 3: // JP C, imm16
             if(rg.get_Carry_flag()) {
-                u8 low_byte = mmu.get().read_from_bytes(rg.program_counter);
-                rg.program_counter += 1;
-                u8 high_byte = mmu.get().read_from_bytes(rg.program_counter);
-                rg.program_counter += 1;
+                u8 low_byte  = mmu.get().read_from_bytes(rg.program_counter++);
+                u8 high_byte = mmu.get().read_from_bytes(rg.program_counter++);
 
                 rg.program_counter = (static_cast<u16>(high_byte) << 8) | low_byte;
+                clock.cycle_tick(nonCB_opcode_cycles[opcode]);
             }
             else {
-                rg.program_counter += 2; // skip the immediate value
+                rg.program_counter += 2;
+                clock.cycle_tick(12);
             }
             break;        
         
     }
-
-    clock.cycle_tick(nonCB_opcode_cycles[opcode]);
 }
 
 void CPU :: JP_imm16() {
-    u8 low_byte = mmu.get().read_from_bytes(rg.program_counter);
-    rg.program_counter += 1;
-    u8 high_byte = mmu.get().read_from_bytes(rg.program_counter);
-    rg.program_counter += 1;
+    u8 low_byte  = mmu.get().read_from_bytes(rg.program_counter++);
+    u8 high_byte = mmu.get().read_from_bytes(rg.program_counter++);
 
     rg.program_counter = (static_cast<u16>(high_byte) << 8) | low_byte;
     clock.cycle_tick(nonCB_opcode_cycles[opcode]);
 }
 
 void CPU :: JP_hl() { 
-    u8 low_byte = mmu.get().read_from_bytes(rg.hl);
-    rg.program_counter += 1;
-    u8 high_byte = mmu.get().read_from_bytes(rg.hl + 1);
-    rg.program_counter += 1;
+    u8 low_byte  = read_register(rg.l);
+    u8 high_byte = read_register(rg.h);
 
     rg.program_counter = (static_cast<u16>(high_byte) << 8) | low_byte;
     clock.cycle_tick(nonCB_opcode_cycles[opcode]);
