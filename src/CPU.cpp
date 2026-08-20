@@ -1215,8 +1215,6 @@ void CPU :: CP_imm8() {
 
 // RET functions
 void CPU :: RET_cond() { //fix this
-    u8 condition = (opcode & 0x18) >> 3; // bit 4 and 3
-
     if(!rg.get_Zero_flag() || rg.get_Zero_flag() || !rg.get_Carry_flag() || rg.get_Carry_flag()) {
         u8 low_byte  = mmu.get().read_from_bytes(rg.stack_pointer++);
         u8 high_byte = mmu.get().read_from_bytes(rg.stack_pointer++);
@@ -1249,53 +1247,13 @@ void CPU :: RETI() { // return from interrupt
 
 // JUMP functions
 void CPU :: JR_cond_imm8() {
-    u8 condition = (opcode & 0x18) >> 3; // bits 4-3
-
-    switch(condition) {
-        case 0: // JR NZ, imm8
-            if(!rg.get_Zero_flag()) {
-                u8 offset = static_cast<u8>(mmu.get().read_from_bytes(rg.program_counter++));
-                rg.program_counter += offset;
-                clock.cycle_tick(nonCB_opcode_cycles[opcode]);
-            }
-            else {
-                rg.program_counter += 1;
-                clock.cycle_tick(8);
-            }
-            break;
-        case 1: // JR Z, imm8
-            if(rg.get_Zero_flag()) {
-                u8 offset = static_cast<u8>(mmu.get().read_from_bytes(rg.program_counter++));
-                rg.program_counter += offset;
-                clock.cycle_tick(nonCB_opcode_cycles[opcode]);
-            }
-            else {
-                rg.program_counter += 1; 
-                clock.cycle_tick(8);
-            }
-            break;
-        case 2: // JR NC, imm8
-            if(!rg.get_Carry_flag()) {
-                u8 offset = static_cast<u8>(mmu.get().read_from_bytes(rg.program_counter++));
-                rg.program_counter += offset;
-                clock.cycle_tick(nonCB_opcode_cycles[opcode]);
-            }
-            else {
-                rg.program_counter += 1; 
-                clock.cycle_tick(8);
-            }
-            break;   
-        case 3: // JR C, imm8
-            if(rg.get_Carry_flag()) {
-                u8 offset = static_cast<u8>(mmu.get().read_from_bytes(rg.program_counter++));
-                rg.program_counter += offset;
-                clock.cycle_tick(nonCB_opcode_cycles[opcode]);
-            }
-            else {
-                rg.program_counter += 1;
-                clock.cycle_tick(8);
-            }
-            break;   
+    if(!rg.get_Zero_flag() || rg.get_Zero_flag() || !rg.get_Carry_flag() || rg.get_Carry_flag()) {
+        u8 offset = static_cast<u8>(mmu.get().read_from_bytes(rg.program_counter++));
+        rg.program_counter += offset;
+        clock.cycle_tick(nonCB_opcode_cycles[opcode]);
+    }
+    else {
+        clock.cycle_tick(8);
     }
 }
 
@@ -1307,61 +1265,15 @@ void CPU :: JR_imm8() {
 }
 
 void CPU :: JP_cond_imm16() {
-    u8 condition = (opcode & 0x18) >> 3; // bits 4-3
-    switch(condition) {
-        case 0: // JP NZ, imm16
-            if(!rg.get_Zero_flag()) {
-                u8 low_byte  = mmu.get().read_from_bytes(rg.program_counter++);
-                u8 high_byte = mmu.get().read_from_bytes(rg.program_counter++);
+    if(!rg.get_Zero_flag() || rg.get_Zero_flag() || !rg.get_Carry_flag() || rg.get_Carry_flag()) {
+        u8 low_byte  = mmu.get().read_from_bytes(rg.program_counter++);
+        u8 high_byte = mmu.get().read_from_bytes(rg.program_counter++);
 
-                rg.program_counter = (static_cast<u16>(high_byte) << 8) | low_byte;
-                clock.cycle_tick(nonCB_opcode_cycles[opcode]);
-            }
-            else {
-                rg.program_counter += 2; 
-                clock.cycle_tick(12);
-            }
-            break;
-        case 1: // JP Z, imm16
-            if(rg.get_Zero_flag()) {
-                u8 low_byte  = mmu.get().read_from_bytes(rg.program_counter++);
-                u8 high_byte = mmu.get().read_from_bytes(rg.program_counter++);
-
-                rg.program_counter = (static_cast<u16>(high_byte) << 8) | low_byte;
-                clock.cycle_tick(nonCB_opcode_cycles[opcode]);
-            }
-            else {
-                rg.program_counter += 2;
-                clock.cycle_tick(12);
-            }
-            break;
-        case 2: // JP NC, imm16
-            if(!rg.get_Carry_flag()) {
-                u8 low_byte  = mmu.get().read_from_bytes(rg.program_counter++);
-                u8 high_byte = mmu.get().read_from_bytes(rg.program_counter++);
-
-                rg.program_counter = (static_cast<u16>(high_byte) << 8) | low_byte;
-                clock.cycle_tick(nonCB_opcode_cycles[opcode]);
-            }
-            else {
-                rg.program_counter += 2;
-                clock.cycle_tick(12); 
-            }
-            break;
-        case 3: // JP C, imm16
-            if(rg.get_Carry_flag()) {
-                u8 low_byte  = mmu.get().read_from_bytes(rg.program_counter++);
-                u8 high_byte = mmu.get().read_from_bytes(rg.program_counter++);
-
-                rg.program_counter = (static_cast<u16>(high_byte) << 8) | low_byte;
-                clock.cycle_tick(nonCB_opcode_cycles[opcode]);
-            }
-            else {
-                rg.program_counter += 2;
-                clock.cycle_tick(12);
-            }
-            break;        
-        
+        rg.program_counter = (static_cast<u16>(high_byte) << 8) | low_byte;
+        clock.cycle_tick(nonCB_opcode_cycles[opcode]);
+    }
+    else {
+        clock.cycle_tick(12);
     }
 }
 
@@ -1383,92 +1295,23 @@ void CPU :: JP_hl() {
 
 // CALL functions
 void CPU :: CALL_cond_i16() {
-    u8 condition = (opcode & 0x18) >> 3; // bits 4-3
-    switch(condition) {
-        case 0: // CALL NZ, imm16
-            if(!rg.get_Zero_flag()) {
-                u8 low_byte  = mmu.get().read_from_bytes(rg.program_counter++);
-                u8 high_byte = mmu.get().read_from_bytes(rg.program_counter++);
+    if(!rg.get_Zero_flag() || rg.get_Zero_flag() || !rg.get_Carry_flag() || rg.get_Carry_flag()) {
+        u8 low_byte  = mmu.get().read_from_bytes(rg.program_counter++);
+        u8 high_byte = mmu.get().read_from_bytes(rg.program_counter++);
 
-                u16 address = (static_cast<u16>(high_byte) << 8) | low_byte;
+        u16 address = (static_cast<u16>(high_byte) << 8) | low_byte;
 
-                // push the current program counter to the stack
-                rg.stack_pointer--;
-                mmu.get().write_to_bytes(rg.stack_pointer, (rg.program_counter >> 8) & 0xff); // high byte
-                rg.stack_pointer--;
-                mmu.get().write_to_bytes(rg.stack_pointer + 1, rg.program_counter & 0xff); // low byte
+        // push the current program counter to the stack
+        rg.stack_pointer--;
+        mmu.get().write_to_bytes(rg.stack_pointer, (rg.program_counter >> 8) & 0xff); // high byte
+        rg.stack_pointer--;
+        mmu.get().write_to_bytes(rg.stack_pointer + 1, rg.program_counter & 0xff); // low byte
 
-                rg.program_counter = address;
-                clock.cycle_tick(nonCB_opcode_cycles[opcode]);
-            }
-            else {
-                rg.program_counter += 2; // skip the immediate value
-                clock.cycle_tick(12);
-            }
-            break;
-        case 1: // CALL Z, imm16
-            if(rg.get_Zero_flag()) {
-                u8 low_byte  = mmu.get().read_from_bytes(rg.program_counter++);
-                u8 high_byte = mmu.get().read_from_bytes(rg.program_counter++);
-
-                u16 address = (static_cast<u16>(high_byte) << 8) | low_byte;
-
-                // push the current program counter to the stack
-                rg.stack_pointer--;
-                mmu.get().write_to_bytes(rg.stack_pointer, (rg.program_counter >> 8) & 0xff); // high byte
-                rg.stack_pointer--;
-                mmu.get().write_to_bytes(rg.stack_pointer + 1, rg.program_counter & 0xff); // low byte
-
-                rg.program_counter = address;
-                clock.cycle_tick(nonCB_opcode_cycles[opcode]);
-            }
-            else {
-                rg.program_counter += 2; // skip the immediate value
-                clock.cycle_tick(12);
-            }
-            break;
-        case 2: // CALL NC, imm16
-            if(!rg.get_Carry_flag()) {
-                u8 low_byte = mmu.get().read_from_bytes(rg.program_counter++);
-                u8 high_byte = mmu.get().read_from_bytes(rg.program_counter++);
-
-                u16 address = (static_cast<u16>(high_byte) << 8) | low_byte;
-
-                // push the current program counter to the stack
-                rg.stack_pointer--;
-                mmu.get().write_to_bytes(rg.stack_pointer, (rg.program_counter >> 8) & 0xff); // high byte
-                rg.stack_pointer--;
-                mmu.get().write_to_bytes(rg.stack_pointer + 1, rg.program_counter & 0xff); // low byte
-
-                rg.program_counter = address;
-                clock.cycle_tick(nonCB_opcode_cycles[opcode]);
-            }
-            else {
-                rg.program_counter += 2; // skip the immediate value
-                clock.cycle_tick(12);
-            }
-            break;
-        case 3: // CALL C, imm16
-            if(rg.get_Carry_flag()) {
-                u8 low_byte = mmu.get().read_from_bytes(rg.program_counter++);
-                u8 high_byte = mmu.get().read_from_bytes(rg.program_counter++);
-
-                u16 address = (static_cast<u16>(high_byte) << 8) | low_byte;
-
-                // push the current program counter to the stack
-                rg.stack_pointer--;
-                mmu.get().write_to_bytes(rg.stack_pointer, (rg.program_counter >> 8) & 0xff); // high byte
-                rg.stack_pointer--;
-                mmu.get().write_to_bytes(rg.stack_pointer + 1, rg.program_counter & 0xff); // low byte
-
-                rg.program_counter = address;
-                clock.cycle_tick(nonCB_opcode_cycles[opcode]);
-            }
-            else {
-                rg.program_counter += 2; // skip the immediate value
-                clock.cycle_tick(12);
-            }
-            break;    
+        rg.program_counter = address;
+        clock.cycle_tick(nonCB_opcode_cycles[opcode]);
+    }
+    else{
+        clock.cycle_tick(12);
     }
 }
 
