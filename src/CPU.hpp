@@ -178,10 +178,6 @@ class CPU {
         constexpr u8 read_register(u8 reg);
         constexpr void write_register(u8 reg, u8 value);
 
-        // read and write functions for CB instructions in registers
-        constexpr u8 read_CB_register(u8 reg);
-        constexpr void write_CB_register(u8 reg, u8 value);
-
         // execute interrupts
         void execute_interrupts();
  
