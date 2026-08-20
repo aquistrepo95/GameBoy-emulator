@@ -1499,7 +1499,7 @@ void CPU :: SRL() {
     u8 bit_0 = (register_val & 0x01);
 
     // shift right
-    register_val = (register_val >> 1) | (0 << 7);
+    register_val = (register_val >> 1);
     write_register(source, register_val);
 
     rg.f &= ~(rg.Subtract_flag | rg.HalfCarry_flag | rg.Carry_flag);
@@ -1519,9 +1519,9 @@ void CPU :: BIT_b3_r8() {
     // isolate bit_idx
     bool bit_is_off = (register_val & bit_idx) == 0;
 
-    rg.set_flag(rg.Carry_flag, bit_is_off);
-    rg.set_flag(rg.HalfCarry_flag, true);
+    rg.set_flag(rg.Zero_flag, bit_is_off);
     rg.set_flag(rg.Subtract_flag, false);
+    rg.set_flag(rg.HalfCarry_flag, true);
 
     clock.cycle_tick(CB_opcode_cycles[opcode]);
 }
