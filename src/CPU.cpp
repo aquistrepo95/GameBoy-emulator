@@ -1373,45 +1373,15 @@ void CPU :: invalid() {
     clock.cycle_tick(nonCB_opcode_cycles[opcode]);
 }
 
-
-
 /*###################################################### CB instructions ######################################################*/
-u8 CPU :: read_CB_register(u8 source) {
-    switch(source) {
-        case 0: return rg.b; break;
-        case 1: return rg.c; break;
-        case 2: return rg.d; break;
-        case 3: return rg.e; break;
-        case 4: return rg.h; break;
-        case 5: return rg.l; break;
-        case 6: return mmu.get().read_from_bytes(rg.hl); break;
-        case 7: return rg.a; break;
-        default: break;
-    }
-}
-
-void CPU :: write_CB_register(u8 destination, u8 value) {
-    switch(destination){
-       case 0: rg.b = value; break;
-       case 1: rg.c = value; break;
-       case 2: rg.d = value; break;
-       case 3: rg.e = value; break;
-       case 4: rg.h = value; break;
-       case 5: rg.l = value; break;
-       case 6: mmu.get().write_to_bytes(rg.hl, value); break;
-       case 7: rg.a = value; break;
-       default: break;
-    }
-}
-
 void CPU :: RLC() {
     u8 source = opcode & 0x07;
-    u8 register_val = read_CB_register(source);
+    u8 register_val = read_register(source);
     u8 bit_7 = (register_val & 0x80) >> 7; 
 
     //rotate left carry
     register_val = (register_val << 1) | bit_7;
-    write_CB_register(source, register_val);
+    write_register(source, register_val);
 
     rg.f &= ~(rg.Subtract_flag | rg.HalfCarry_flag | rg.Carry_flag);
 
@@ -1424,12 +1394,12 @@ void CPU :: RLC() {
 
 void CPU :: RRC() {
     u8 source = opcode & 0x07;
-    u8 register_val = read_CB_register(source);
+    u8 register_val = read_register(source);
     u8 bit_0 = (register_val & 0x01);
     
     // rotate right carry
     register_val = (register_val >> 1) | (bit_0 << 7);
-    write_CB_register(source, register_val); 
+    write_register(source, register_val); 
 
     rg.f &= ~(rg.Subtract_flag | rg.HalfCarry_flag | rg.Carry_flag);
 
@@ -1442,12 +1412,12 @@ void CPU :: RRC() {
 
 void CPU :: RL() {
     u8 source = opcode & 0x07;
-    u8 register_val = read_CB_register(source);
+    u8 register_val = read_register(source);
     u8 bit_7 = (register_val & 0x80) >> 7;
 
     // rotate left
     register_val = (register_val << 1) | (rg.get_Carry_flag() >> 4);
-    write_CB_register(source, register_val);
+    write_register(source, register_val);
 
     rg.f &= ~(rg.Subtract_flag | rg.HalfCarry_flag | rg.Carry_flag);
 
@@ -1460,12 +1430,12 @@ void CPU :: RL() {
 
 void CPU :: RR() {
     u8 source = opcode & 0x07;
-    u8 register_val = read_CB_register(source);
+    u8 register_val = read_register(source);
     u8 bit_0 = (register_val & 0x01);
 
     // rotate right
     register_val = (register_val >> 1) | (rg.get_Carry_flag() << 3);
-    write_CB_register(source, register_val);
+    write_register(source, register_val);
 
     rg.f &= ~(rg.Subtract_flag | rg.HalfCarry_flag | rg.Carry_flag);
 
@@ -1478,12 +1448,12 @@ void CPU :: RR() {
 
 void CPU :: SLA() {
     u8 source = opcode & 0x07;
-    u8 register_val = read_CB_register(source);
+    u8 register_val = read_register(source);
     u8 bit_7 = (register_val & 0x80) >> 7;
 
     // shift left
-    register_val = (register_val << 1) | 0;
-    write_CB_register(source, register_val);
+    register_val = (register_val << 1);
+    write_register(source, register_val);
 
     rg.f &= ~(rg.Subtract_flag | rg.HalfCarry_flag | rg.Carry_flag);
 
@@ -1496,12 +1466,12 @@ void CPU :: SLA() {
 
 void CPU :: SRA() {
     u8 source = opcode & 0x07;
-    u8 register_val = read_CB_register(source);
+    u8 register_val = read_register(source);
     u8 bit_0 = (register_val & 0x01);
 
     // shift right
-    register_val = (register_val >> 1) | (bit_0 << 7);
-    write_CB_register(source, register_val);
+    register_val = (register_val >> 1);
+    write_register(source, register_val);
 
     rg.f &= ~(rg.Subtract_flag | rg.HalfCarry_flag | rg.Carry_flag);
 
@@ -1514,7 +1484,7 @@ void CPU :: SRA() {
 
 void CPU :: SWAP() {
     u8 source = opcode & 0x07;
-    u8 register_val = read_CB_register(source);
+    u8 register_val = read_register(source);
     u8 low_bits  = register_val & 0x0f;
     u8 high_bits = (register_val & 0xf0) >> 4;
 
@@ -1525,12 +1495,12 @@ void CPU :: SWAP() {
 
 void CPU :: SRL() {
     u8 source = opcode & 0x07;
-    u8 register_val = read_CB_register(source);
+    u8 register_val = read_register(source);
     u8 bit_0 = (register_val & 0x01);
 
     // shift right
     register_val = (register_val >> 1) | (0 << 7);
-    write_CB_register(source, register_val);
+    write_register(source, register_val);
 
     rg.f &= ~(rg.Subtract_flag | rg.HalfCarry_flag | rg.Carry_flag);
 
@@ -1543,7 +1513,7 @@ void CPU :: SRL() {
 
 void CPU :: BIT_b3_r8() {
     u8 source = opcode & 0x07;
-    u8 register_val = read_CB_register(source);
+    u8 register_val = read_register(source);
     u8 bit_idx = (opcode & 0x38) >> 3;
 
     // isolate bit_idx
@@ -1558,24 +1528,24 @@ void CPU :: BIT_b3_r8() {
 
 void CPU :: RES_b3_r8() {
     u8 source = opcode & 0x07;
-    u8 register_val = read_CB_register(source);
+    u8 register_val = read_register(source);
     u8 bit_idx = (opcode & 0x38) >> 3;
 
     // reset bit_idx
     register_val &= ~(1 << bit_idx);
-    write_CB_register(source, register_val);
+    write_register(source, register_val);
 
     clock.cycle_tick(CB_opcode_cycles[opcode]);
 }
 
 void CPU :: SET_b3_r8() {
     u8 source = opcode & 0x07;
-    u8 register_val = read_CB_register(source);
+    u8 register_val = read_register(source);
     u8 bit_idx = (opcode & 0x38) >> 3;
 
     //set bit_idx
     register_val |= (1 < bit_idx);
-    write_CB_register(source, register_val);
+    write_register(source, register_val);
 
     clock.cycle_tick(CB_opcode_cycles[opcode]);
 }
