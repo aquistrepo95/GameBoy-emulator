@@ -91,7 +91,7 @@ void CPU :: execute_interrupts() {
     if(bit_mask != 0) {
         IME_flag = false; // ensure no interrupts 
 
-        mmu.get().write_to_bytes(0xff0f, (if_reg & ~bit_mask)); // reset the If register
+        mmu.get().write_to_bytes(0xff0f, (if_reg & ~bit_mask)); // reset the IF register
 
         // push the current address of the program counter to the stack to allow execution of the interrupt
         rg.stack_pointer = -1;
@@ -1214,7 +1214,7 @@ void CPU :: CP_imm8() {
 }
 
 // RET functions
-void CPU :: RET_cond() { //fix this
+void CPU :: RET_cond() {
     if(!rg.get_Zero_flag() || rg.get_Zero_flag() || !rg.get_Carry_flag() || rg.get_Carry_flag()) {
         u8 low_byte  = mmu.get().read_from_bytes(rg.stack_pointer++);
         u8 high_byte = mmu.get().read_from_bytes(rg.stack_pointer++);
@@ -1338,16 +1338,16 @@ void CPU :: RST() {
     rg.stack_pointer -= 1;
     mmu.get().write_to_bytes(rg.stack_pointer, rg.program_counter & 0xff); // low byte
 
-    u8 rst_address = (opcode & 0x38); // bits 5-3
-    switch(rst_address) {
-        case 0x00: rg.program_counter = 0x00; break;
-        case 0x08: rg.program_counter = 0x08; break;
-        case 0x10: rg.program_counter = 0x10; break;
-        case 0x18: rg.program_counter = 0x18; break;
-        case 0x20: rg.program_counter = 0x20; break;
-        case 0x28: rg.program_counter = 0x28; break;
-        case 0x30: rg.program_counter = 0x30; break;
-        case 0x38: rg.program_counter = 0x38; break;
+    u8 target = (opcode & 0x38) >> 3; // bits 5-3
+    switch(target) {
+        case 0: rg.program_counter = 0x0000; break;
+        case 1: rg.program_counter = 0x0008; break;
+        case 2: rg.program_counter = 0x0010; break;
+        case 3: rg.program_counter = 0x0018; break;
+        case 4: rg.program_counter = 0x0020; break;
+        case 5: rg.program_counter = 0x0028; break;
+        case 6: rg.program_counter = 0x0030; break;
+        case 7: rg.program_counter = 0x0038; break;
         default: break; // invalid RST address
     }
 
